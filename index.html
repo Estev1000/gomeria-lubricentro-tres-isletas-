@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gomeria / Lubricentro Tres Isletas - Gestión Inteligente</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="logo.png" style="height: 60px; width: auto; object-fit: contain;">
+            <div style="display: flex; flex-direction: column; justify-content: center; line-height: 1.1;">
+                <span style="font-size: 1.2rem;">Gomeria / Lubricentro</span>
+                <span class="highlight" style="font-size: 1rem;">Tres Isletas</span>
+            </div>
+        </div>
+        <nav>
+            <button onclick="showView('dashboard')" class="active"><i class="ph ph-squares-four"></i> Panel</button>
+            <button onclick="showView('new')"><i class="ph ph-plus-circle"></i> Nuevo Ingreso</button>
+        </nav>
+    </header>
+
+    <section id="view-dashboard" class="container">
+        <div class="header-section">
+            <h1>Reparaciones Activas</h1>
+            <input type="text" id="search" placeholder="Buscar cliente o equipo..." onkeyup="renderRepairs()">
+        </div>
+        <div id="repair-list" class="grid-list"></div>
+    </section>
+
+    <section id="view-new" class="container hidden">
+        <h1>Nuevo Ingreso de Taller</h1>
+        <form id="new-repair-form">
+            <div class="card">
+                <h2><i class="ph ph-user"></i> Datos del Cliente</h2>
+                <div class="form-group"><label>Nombre</label><input type="text" id="clientName" required></div>
+                <div class="form-group"><label>WhatsApp</label><input type="tel" id="clientPhone" required></div>
+            </div>
+            <div class="card">
+                <h2><i class="ph ph-device-mobile"></i> Equipo</h2>
+                <div class="form-group"><label>Modelo / Descripción</label><input type="text" id="deviceModel" required>
+                </div>
+                <div class="form-group"><label>Presupuesto Estimado ($)</label><input type="number" id="estimatedCost">
+                </div>
+            </div>
+            <button type="submit" class="btn-primary">Registrar Ingreso</button>
+        </form>
+    </section>
+
+    <section id="view-detail" class="container hidden">
+        <button onclick="showView('dashboard')" class="btn-back"><i class="ph ph-arrow-left"></i> Volver</button>
+        <div class="detail-card">
+            <div class="detail-header">
+                <h1 id="detail-device">Equipo</h1>
+                <span id="detail-status" class="badge">Estado</span>
+            </div>
+            <p id="detail-client" class="text-muted">Cliente</p>
+
+            <div class="actions" style="margin-top: 1.5rem;">
+                <label style="color: var(--text-muted); font-size: 0.9rem;">Presupuesto / Costo ($)</label>
+                <div style="display: flex; gap: 10px; margin-bottom: 1.5rem;">
+                    <input type="number" id="detail-cost-input" style="flex-grow: 1;" placeholder="0.00">
+                    <button onclick="updatePrice()" class="btn-primary"
+                        style="padding: 0 1rem; width: auto; font-size: 0.9rem;">Guardar Precio</button>
+                </div>
+
+                <h3>Actualizar Estado</h3>
+                <div class="status-buttons">
+                    <button onclick="updateStatus('pending')" class="btn-status">En Espera</button>
+                    <button onclick="updateStatus('working')" class="btn-status">En Taller</button>
+                    <button onclick="updateStatus('waiting_parts')" class="btn-status">Repuestos</button>
+                    <button onclick="updateStatus('ready')" class="btn-status">¡LISTO!</button>
+                    <button onclick="updateStatus('delivered')" class="btn-status">Entregado</button>
+                </div>
+            </div>
+
+            <div class="share-section">
+                <p>Opciones para el Cliente:</p>
+                <div class="link-box">
+                    <code id="share-link">...</code>
+                    <button onclick="sendWhatsApp()" class="btn-whatsapp"><i class="ph ph-whatsapp-logo"></i>
+                        Link</button>
+                </div>
+                <button onclick="downloadStatusImage()" class="btn-primary"
+                    style="margin-top: 1rem; width: 100%; background: #3b82f6;">
+                    <i class="ph ph-image"></i> DESCARGAR FOTO PARA WHATSAPP
+                </button>
+
+                <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border);">
+
+                <button onclick="deleteRepair()" class="btn-primary"
+                    style="width: 100%; background: #ef4444; font-size: 0.9rem; opacity: 0.8;">
+                    <i class="ph ph-trash"></i> ELIMINAR REGISTRO
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section id="view-client" class="container hidden">
+        <div class="detail-card" style="text-align: center;">
+            <i class="ph-fill ph-check-circle" style="font-size: 3rem; color: var(--accent);"></i>
+            <h1 style="color: var(--accent);">Estado en Vivo</h1>
+            <p id="client-order-id" class="text-muted">Orden #...</p>
+            <h2 id="client-device-model" style="margin: 1rem 0;">Cargando...</h2>
+            <p id="client-name-display" class="text-muted" style="margin-bottom: 2rem;"></p>
+            <div id="client-progress"
+                style="text-align: left; max-width: 320px; margin: 2rem auto; background: var(--bg-color); padding: 1.5rem; border-radius: 1rem;">
+            </div>
+            <div class="share-section">
+                <p>Costo Estimado</p>
+                <h2 id="client-cost" style="color: var(--accent); font-size: 2.5rem; margin-top: 0.5rem;">$ -</h2>
+            </div>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

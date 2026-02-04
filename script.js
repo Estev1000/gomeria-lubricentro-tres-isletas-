@@ -204,10 +204,7 @@ function safeEncode(obj) {
     }));
 }
 
-function getStatusLabel(s) {
-    const l = { pending: 'En Espera', working: 'En Taller', waiting_parts: 'Repuestos', ready: '¡LISTO!', delivered: 'Entregado' };
-    return l[s] || s;
-}
+
 
 // --- COMPARTIR ---
 function sendWhatsApp() {
@@ -296,6 +293,12 @@ function showView(viewName) {
     document.querySelectorAll('section').forEach(el => el.classList.add('hidden'));
     const v = document.getElementById(`view-${viewName}`);
     if (v) v.classList.remove('hidden');
+
+    // Actualizar botones de navegación
+    document.querySelectorAll('header nav button').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.getElementById(`nav-${viewName}`);
+    if (activeBtn) activeBtn.classList.add('active');
+
     const h = document.querySelector('header');
     if (viewName === 'client') h.style.display = 'none';
     else h.style.display = 'flex';
@@ -313,4 +316,72 @@ function deleteRepair() {
     saveRepairs(list);
     showView('dashboard');
     renderRepairs(); // actualizar la vista del dashboard al instante
+}
+
+// --- GESTIÓN DE DATOS (SEGURIDAD) ---
+function exportJSON() {
+    const data = getRepairs();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `respaldo_taller_pro_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function exportCSV() {
+    const data = getRepairs();
+    if (data.length === 0) {
+        alert("No hay datos para exportar.");
+        return;
+    }
+
+    const headers = ["ID", "Cliente", "WhatsApp", "Equipo", "Estado", "Precio Estimado"];
+    const rows = data.map(r => [
+        r.id,
+        r.clientName,
+        r.clientPhone,
+        r.deviceModel,
+        getStatusLabel(r.status),
+        r.estimatedCost
+    ]);
+
+    let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // BOM for Excel UTF-8
+    csvContent += headers.join(";") + "\n";
+    rows.forEach(row => {
+        csvContent += row.map(field => `"${field}"`).join(";") + "\n";
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `taller_pro_excel_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function importJSON(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const importedData = JSON.parse(e.target.result);
+            if (Array.isArray(importedData)) {
+                if (confirm(`Se importarán ${importedData.length} registros. ¿Deseas continuar?`)) {
+                    saveRepairs(importedData);
+                    alert("¡Datos restaurados con éxito!");
+                    location.reload();
+                }
+            } else {
+                alert("El archivo no tiene un formato válido.");
+            }
+        } catch (err) {
+            alert("Error al leer el archivo. Asegúrate de que sea un archivo .json de respaldo.");
+        }
+    };
+    reader.readAsText(file);
 }

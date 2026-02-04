@@ -20,8 +20,10 @@
             </div>
         </div>
         <nav>
-            <button onclick="showView('dashboard')" class="active"><i class="ph ph-squares-four"></i> Panel</button>
-            <button onclick="showView('new')"><i class="ph ph-plus-circle"></i> Nuevo Ingreso</button>
+            <button onclick="showView('dashboard')" id="nav-dashboard" class="active"><i class="ph ph-squares-four"></i>
+                Panel</button>
+            <button onclick="showView('new')" id="nav-new"><i class="ph ph-plus-circle"></i> Nuevo Ingreso</button>
+            <button onclick="showView('settings')" id="nav-settings"><i class="ph ph-database"></i> Respaldo</button>
         </nav>
     </header>
 
@@ -98,6 +100,37 @@
                     <i class="ph ph-trash"></i> ELIMINAR REGISTRO
                 </button>
             </div>
+        </div>
+    </section>
+
+    <section id="view-settings" class="container hidden">
+        <h1>Centro de Datos y Seguridad</h1>
+        <p class="text-muted" style="margin-bottom: 2rem;">Protege tu información. Descarga copias de seguridad
+            periódicas de tu taller.</p>
+
+        <div class="card">
+            <h2><i class="ph ph-export"></i> Exportar Información</h2>
+            <p style="margin-bottom: 1rem; font-size: 0.9rem;">Guarda todos tus registros en un archivo para tener un
+                respaldo seguro.</p>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button onclick="exportJSON()" class="btn-primary" style="background: var(--accent); color: #000;">
+                    <i class="ph ph-file-js"></i> DESCARGAR RESPALDO (JSON)
+                </button>
+                <button onclick="exportCSV()" class="btn-primary" style="background: #22c55e; color: #fff;">
+                    <i class="ph ph-file-xls"></i> EXPORTAR PARA EXCEL (CSV)
+                </button>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 2rem;">
+            <h2><i class="ph ph-import"></i> Restaurar Respaldo</h2>
+            <p style="margin-bottom: 1rem; font-size: 0.9rem;">Si cambiaste de computadora o navegador, selecciona tu
+                archivo de respaldo para recuperar los datos.</p>
+            <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="importJSON(event)">
+            <button onclick="document.getElementById('fileInput').click()" class="btn-primary"
+                style="background: #3b82f6;">
+                <i class="ph ph-upload-simple"></i> SELECCIONAR ARCHIVO JSON
+            </button>
         </div>
     </section>
 

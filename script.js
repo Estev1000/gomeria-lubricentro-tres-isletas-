@@ -207,12 +207,48 @@ function safeEncode(obj) {
 
 
 // --- COMPARTIR ---
+function copyToClipboard() {
+    const linkText = document.getElementById('share-link').textContent;
+    navigator.clipboard.writeText(linkText).then(() => {
+        alert('Enlace copiado al portapapeles');
+    }).catch(err => {
+        console.error('Error al copiar: ', err);
+        // Fallback simple
+        const textArea = document.createElement("textarea");
+        textArea.value = linkText;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            alert('Enlace copiado al portapapeles');
+        } catch (err) {
+            console.error('No se pudo copiar', err);
+        }
+        document.body.removeChild(textArea);
+    });
+}
+
 function sendWhatsApp() {
     const link = document.getElementById('share-link').textContent;
     const r = getRepairs().find(i => i.id === currentRepairId);
-    if (r) {
+    if (r && r.clientPhone) {
+        // Limpieza del número: quitar todo lo que no sea dígito
+        let phone = r.clientPhone.replace(/[^0-9]/g, '');
+
+        // Corrección inteligente para Argentina (Tres Isletas)
+        // Si tiene 10 dígitos (ej. 3644xxxxxx), asumimos que falta 549
+        if (phone.length === 10) {
+            phone = '549' + phone;
+        }
+        // Si tiene 11 dígitos y arranca con 0 (ej. 03644xxxxxx), quitamos 0 y agregamos 549
+        else if (phone.length === 11 && phone.startsWith('0')) {
+            phone = '549' + phone.substring(1);
+        }
+
         const msg = `Hola ${r.clientName}, ya puedes ver el estado de tu ${r.deviceModel} aqui: ${link}`;
-        window.open(`https://wa.me/${r.clientPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+    } else {
+        alert("Número de teléfono no disponible.");
     }
 }
 

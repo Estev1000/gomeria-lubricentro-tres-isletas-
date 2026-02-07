@@ -85,8 +85,12 @@
                 <p>Opciones para el Cliente:</p>
                 <div class="link-box">
                     <code id="share-link">...</code>
+                    <button onclick="copyToClipboard()" class="btn-status" title="Copiar Link"
+                        style="display:flex; align-items:center; gap:5px;">
+                        <i class="ph ph-copy"></i> Copiar
+                    </button>
                     <button onclick="sendWhatsApp()" class="btn-whatsapp"><i class="ph ph-whatsapp-logo"></i>
-                        Link</button>
+                        WhatsApp</button>
                 </div>
                 <button onclick="downloadStatusImage()" class="btn-primary"
                     style="margin-top: 1rem; width: 100%; background: #3b82f6;">
